@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 1: Python Quiz Challenge</title>
+<style>
+    :root {
+        --header-blue: #000033;
+        --bg-white: #ffffff;
+        --card-grey: #f2f2f2;
+        --accent-yellow: #fdb813;
+        --text-blue: #000033;
+    }
+
+    body {
+        font-family: 'Segoe UI', Roboto, sans-serif;
+        background-color: var(--bg-white);
+        margin: 0;
+        padding: 0;
+        color: #333;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    .header-wrapper {
+        background-color: var(--header-blue);
+        padding: 40px 20px 20px 20px;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        color: white;
+    }
+
+    .header-container {
+        max-width: 900px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .header-container h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .sub-heading {
+        margin-top: 5px;
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+
+    #timer {
+        background: var(--accent-yellow);
+        color: #000;
+        padding: 10px 25px;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+
+    .progress-box {
+        max-width: 900px;
+        margin: 15px auto 0 auto;
+    }
+
+    .progress-track {
+        width: 100%;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.2);
+        margin-top: 5px;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        background: var(--accent-yellow);
+        width: 0%;
+        transition: width 0.3s ease;
+    }
+
+    .quiz-main {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .quiz-section {
+        margin-bottom: 25px;
+        padding: 30px;
+        background: var(--card-grey);
+        border-radius: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .question-title {
+        color: var(--text-blue);
+        font-size: 1.25rem;
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-weight: 700;
+    }
+
+    .options-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .option-label {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        background: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: 0.2s;
+        font-weight: 500;
+    }
+
+    .option-label:hover {
+        border-color: var(--accent-yellow);
+    }
+
+    .option-label input[type="radio"] {
+        margin-right: 12px;
+        accent-color: var(--header-blue);
+    }
+
+    .submit-container {
+        text-align: center;
+        margin: 50px 0;
+    }
+
+    .submit-btn {
+        width: 100%;
+        max-width: 400px;
+        padding: 18px;
+        background: var(--header-blue);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .submit-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+
+    @media (max-width: 600px) {
+        .options-grid { grid-template-columns: 1fr; }
+        .header-container h1 { font-size: 1.4rem; }
+    }
+</style>
+</head>
+<body>
+
+<div class="header-wrapper">
+    <div class="header-container">
+        <div>
+            <h1>Round 1: Python Quiz Challenge</h1>
+            <div class="sub-heading">Solve the basics to unlock Round 2</div>
+        </div>
+        <div id="timer">15:00</div>
+    </div>
+    <div class="progress-box">
+        <div class="progress-track">
+            <div class="progress-bar-fill" id="pBar"></div>
+        </div>
+    </div>
+</div>
+
+<div class="quiz-main">
+    <form id="quizForm">
+        <div class="submit-container">
+            <button type="submit" class="submit-btn" id="submitBtn" disabled>Submit Round 1 Answers</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // --- 1. QUESTION DATABASE (Round 1) ---
+    const questionBank = [
+        { id: "q1", text: "Computer Science mainly deals with", options: ["Cooking", "Study of computers and problem solving", "Study of planets", "Study of animals"], correct: "Study of computers and problem solving" },
+        { id: "q2", text: "A physical part of a computer is called", options: ["Software", "Hardware", "Program", "Data"], correct: "Hardware" },
+        { id: "q3", text: "Python is an example of a", options: ["Low-level language", "Machine language", "High-level language", "Binary language"], correct: "High-level language" },
+        { id: "q4", text: "Which of the following is a literal in Python?", options: ["print", "25", "input()", "if"], correct: "25" },
+        { id: "q5", text: "x = 10 means 10 is stored in", options: ["Operator", "Function", "Variable", "Loop"], correct: "Variable" },
+        { id: "q6", text: "Which of the following is NOT a valid identifier?", options: ["name", "_age", "2num", "student_name"], correct: "2num" },
+        { id: "q7", text: "Which operator is used for exponent in Python?", options: ["+", "**", "^", "%"], correct: "**" },
+        { id: "q8", text: "Input in Python is taken using", options: ["read()", "input()", "print()", "type()"], correct: "input()" },
+        { id: "q9", text: "A control structure that chooses between two possibilities", options: ["Sequence", "Selection", "Loop", "Function"], correct: "Selection" },
+        { id: "q10", text: "Which of the following is a Boolean value?", options: ["100", "True", "\"Hello\"", "="], correct: "True" },
+        { id: "q11", text: "Which loop repeats until a condition becomes False?", options: ["if", "for", "while", "break"], correct: "while" },
+        { id: "q12", text: "A function is used to", options: ["Repeat hardware tasks", "Store large databases", "Group reusable code", "Display graphics only"], correct: "Group reusable code" },
+        { id: "q13", text: "A text file stores data as", options: ["Audio", "Characters", "Graphics", "Videos"], correct: "Characters" },
+        { id: "q14", text: "A dictionary stores data as", options: ["Keys only", "Values only", "Key-value pairs", "Nested loops"], correct: "Key-value pairs" },
+        { id: "q15", text: "Object-Oriented Programming focuses on", options: ["Functions only", "Data and methods", "Hardware only", "Recursion always"], correct: "Data and methods" }
+    ];
+
+    // --- 2. SHUFFLE FUNCTIONS ---
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    // --- 3. RENDER QUIZ DYNAMICALLY ---
+    const form = document.getElementById('quizForm');
+    const submitBtnContainer = document.querySelector('.submit-container');
+
+    // Shuffle questions
+    shuffleArray(questionBank);
+
+    // Generate HTML
+    questionBank.forEach((q, index) => {
+        const section = document.createElement('div');
+        section.className = 'quiz-section';
+
+        const title = document.createElement('p');
+        title.className = 'question-title';
+        title.innerText = `${index + 1}. ${q.text}`;
+        section.appendChild(title);
+
+        const grid = document.createElement('div');
+        grid.className = 'options-grid';
+
+        // Shuffle Options
+        let options = [...q.options];
+        shuffleArray(options);
+
+        options.forEach(opt => {
+            const label = document.createElement('label');
+            label.className = 'option-label';
+            
+            const input = document.createElement('input');
+            input.type = 'radio';
+            input.name = q.id;
+            input.value = opt;
+
+            label.appendChild(input);
+            label.appendChild(document.createTextNode(" " + opt));
+            grid.appendChild(label);
+        });
+
+        section.appendChild(grid);
+        form.insertBefore(section, submitBtnContainer);
+    });
+
+    // --- 4. TIMER & LOGIC ---
+    const timerDisplay = document.getElementById('timer');
+    const pBar = document.getElementById('pBar');
+    const submitBtn = document.getElementById('submitBtn');
+
+    let timeLeft = 15 * 60;
+    const timer = setInterval(() => {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerDisplay.textContent = `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+        timeLeft--;
+        if (timeLeft < 0) {
+            clearInterval(timer);
+            alert("Time's up! Submitting...");
+            form.requestSubmit();
+        }
+    }, 1000);
+
+    // Check Progress
+    form.addEventListener('change', () => {
+        const answeredCount = questionBank.filter(q => document.querySelector(`input[name="${q.id}"]:checked`)).length;
+        const total = questionBank.length;
+        const progress = (answeredCount / total) * 100;
+        pBar.style.width = progress + "%";
+        
+        // Enable button only if all answered
+        if (answeredCount === total) {
+            submitBtn.disabled = false;
+        }
+    });
+
+    // Submit Handling
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        clearInterval(timer);
+
+        let score = 0;
+        questionBank.forEach(q => {
+            const selected = document.querySelector(`input[name="${q.id}"]:checked`);
+            if (selected && selected.value === q.correct) {
+                score++;
+            }
+        });
+
+        // Save Score specifically as "currentScore" for the result page to read
+        localStorage.setItem("currentScore", score);
+        localStorage.setItem("currentTotal", questionBank.length); // Dynamic total
+        
+        window.location.href = "result.html";
+    });
+
+    // --- 5. COPY PROTECTION ---
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    document.addEventListener('copy', event => event.preventDefault());
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && (e.key === 'c' || e.key === 'u')) {
+            e.preventDefault();
+        }
+    });
+</script>
+</body>
+</html>
