@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Round 2: Python Word Jumble</title>
+
+<style>
+    /* --- RESET & BASIC SETUP --- */
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #ffffff;
+        color: #333;
+        user-select: none;
+    }
+
+    /* --- HEADER SECTION --- */
+    header {
+        background-color: #020b2d;
+        padding: 20px 10%;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 4px solid #ffc107;
+        margin-bottom: 30px;
+        color: white;
+    }
+
+    .header-left {
+        width: 70%;
+    }
+
+    .header-text h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    .header-text p {
+        color: #a0aab5;
+        margin: 5px 0 15px 0;
+        font-size: 14px;
+    }
+
+    /* --- PROGRESS BAR --- */
+    .progress-container {
+        width: 100%;
+        max-width: 500px;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 5px;
+        height: 10px;
+        overflow: hidden;
+    }
+    
+    .progress-bar {
+        height: 100%;
+        width: 0%;
+        background-color: #ffc107;
+        transition: width 0.3s;
+    }
+
+    /* --- TIMER --- */
+    #timer {
+        background-color: #ffc107;
+        color: #000;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    /* --- MAIN CONTENT --- */
+    .container {
+        width: 80%;
+        max-width: 900px;
+        margin: 0 auto 50px auto;
+        padding: 0 20px;
+    }
+
+    /* --- QUESTION CARDS --- */
+    .question-card {
+        background: #f9f9f9;
+        border: 1px solid #ddd;
+        border-left: 5px solid #020b2d;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        transition: transform 0.2s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .question-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .question-title {
+        font-weight: bold;
+        font-size: 18px;
+        color: #020b2d;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .jumble-word {
+        font-family: 'Courier New', monospace;
+        letter-spacing: 3px;
+        background: #020b2d;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    /* --- INPUTS & BUTTONS --- */
+    input[type="text"] {
+        padding: 10px;
+        width: 100%;
+        max-width: 300px;
+        border: 2px solid #ccc;
+        border-radius: 6px;
+        font-size: 16px;
+        margin: 10px 0;
+        outline: none;
+    }
+
+    input[type="text"]:focus {
+        border-color: #020b2d;
+    }
+
+    .btn-group {
+        margin-top: 10px;
+    }
+
+    button {
+        padding: 10px 20px;
+        margin-right: 8px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    button:hover {
+        opacity: 0.9;
+        transform: scale(1.02);
+    }
+
+    button:disabled {
+        background: #ccc !important;
+        cursor: not-allowed;
+        color: #666;
+        transform: none;
+    }
+
+    .btn-check { background-color: #020b2d; color: white; }
+    .btn-hint { background-color: #ffc107; color: black; }
+
+    /* --- SUBMIT BUTTON --- */
+    .submit-container {
+        text-align: center;
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 2px solid #eee;
+    }
+
+    #submit-all-btn {
+        background-color: #27ae60;
+        color: white;
+        font-size: 18px;
+        padding: 15px 40px;
+        box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3);
+    }
+
+    /* --- FEEDBACK MESSAGES --- */
+    .result {
+        margin-top: 10px;
+        font-weight: bold;
+        min-height: 24px;
+    }
+    .hint { color: #d35400; font-style: italic; }
+    .correct { color: #27ae60; }
+    .incorrect { color: #c0392b; }
+
+</style>
+</head>
+
+<body oncontextmenu="return false">
+
+    <header>
+        <div class="header-left">
+            <div class="header-text">
+                <h1>Round 2: Python Quiz Challenge</h1>
+                <p>Unscramble the words to unlock the next level</p>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+        </div>
+        
+        <div id="timer">10:00</div>
+    </header>
+
+    <div class="container">
+        <div id="quiz-content">
+            </div>
+
+        <div class="submit-container">
+            <button id="submit-all-btn" onclick="submitQuiz()">Submit Quiz</button>
+        </div>
+    </div>
+
+<script>
+/* ---------- DATA ---------- */
+const questions = [
+    { jumble: "adbmal", answer: "lambda", hint: "Used to create anonymous functions" },
+    { jumble: "rotareneg", answer: "generator", hint: "Produces values one at a time using yield" },
+    { jumble: "rotaroced", answer: "decorator", hint: "Modifies the behavior of a function" },
+    { jumble: "noitpecxe", answer: "exception", hint: "Handles runtime errors" },
+    { jumble: "elbareti", answer: "iterable", hint: "Object that can be looped using for" },
+    { jumble: "noisrucer", answer: "recursion", hint: "A function calling itself" },
+    { jumble: "ecapseman", answer: "namespace", hint: "Determines the scope of variables" },
+    { jumble: "gnicils", answer: "slicing", hint: "Used to extract part of a sequence" },
+    { jumble: "eludom", answer: "module", hint: "A file containing Python code" },
+    { jumble: "noitatnedni", answer: "indentation", hint: "Defines blocks of code in Python" }
+];
+
+/* ---------- SHUFFLE LOGIC (Fisher-Yates) ---------- */
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+// Randomize questions before rendering
+shuffleArray(questions);
+
+/* ---------- STATE VARIABLES ---------- */
+let hintCount = 0;
+const MAX_HINTS = 3;
+let correctAnswersCount = 0;
+const quizDiv = document.getElementById("quiz-content");
+const progressBar = document.getElementById("progressBar");
+let isQuizActive = true;
+
+/* ---------- RENDER QUIZ ---------- */
+questions.forEach((q, i) => {
+    quizDiv.innerHTML += `
+        <div class="question-card" id="card${i}">
+            <span class="question-title">${i + 1}. Unscramble: <span class="jumble-word">${q.jumble}</span></span>
+            <input type="text" id="input${i}" placeholder="Type your answer here..." autocomplete="off">
+            <div class="btn-group">
+                <button class="btn-check" id="btnCheck${i}" onclick="checkAnswer(${i})">Check Answer</button>
+                <button class="btn-hint" id="hintBtn${i}" onclick="showHint(${i})">Get Hint</button>
+            </div>
+            <div class="result" id="result${i}"></div>
+        </div>
+    `;
+});
+
+/* ---------- LOGIC ---------- */
+
+function updateProgress() {
+    const percentage = (correctAnswersCount / questions.length) * 100;
+    progressBar.style.width = percentage + "%";
+}
+
+function checkAnswer(i) {
+    if(!isQuizActive) return;
+
+    const inputField = document.getElementById(`input${i}`);
+    const user = inputField.value.trim().toLowerCase();
+    const result = document.getElementById(`result${i}`);
+    const btnCheck = document.getElementById(`btnCheck${i}`);
+
+    if (inputField.disabled) return;
+
+    if (user === questions[i].answer) {
+        result.innerHTML = "Correct!";
+        result.className = "result correct";
+        inputField.style.borderColor = "#27ae60";
+        inputField.style.backgroundColor = "#e8f8f5";
+        inputField.disabled = true;
+        btnCheck.disabled = true;
+        correctAnswersCount++;
+        updateProgress();
+    } else {
+        result.innerHTML = "Incorrect, try again.";
+        result.className = "result incorrect";
+        inputField.style.borderColor = "#c0392b";
+        // Shake animation effect
+        inputField.style.transform = "translateX(5px)";
+        setTimeout(() => inputField.style.transform = "translateX(0)", 100);
+    }
+}
+
+function showHint(i) {
+    if(!isQuizActive) return;
+
+    if (hintCount >= MAX_HINTS) {
+        alert("You have used all 3 hints available for this round!");
+        return;
+    }
+    
+    hintCount++;
+    const result = document.getElementById(`result${i}`);
+    result.innerHTML = `<span class="hint">Hint: ${questions[i].hint}</span>`;
+    
+    document.getElementById(`hintBtn${i}`).disabled = true;
+
+    if (hintCount === MAX_HINTS) {
+        document.querySelectorAll('.btn-hint').forEach(btn => {
+            if(!btn.disabled) {
+                btn.innerText = "No Hints Left";
+                btn.disabled = true;
+            }
+        });
+    }
+}
+
+/* ---------- SUBMIT & END GAME LOGIC ---------- */
+function submitQuiz() {
+    if(!isQuizActive) return;
+
+    let unattemptedCount = 0;
+    
+    // First: Check if there are any empty fields
+    questions.forEach((q, i) => {
+        const inputField = document.getElementById(`input${i}`);
+        if (!inputField.disabled && inputField.value.trim() === "") {
+            unattemptedCount++;
+            inputField.style.borderColor = "#d9534f"; // Highlight empty ones red
+        }
+    });
+
+    // BLOCKER: If any question is empty, stop the submit
+    if (unattemptedCount > 0) {
+        alert(`You have ${unattemptedCount} unanswered questions.\n\nYou must fill in all answers before submitting!`);
+        return;
+    }
+
+    // Check last entered values
+    questions.forEach((q, i) => {
+        const inputField = document.getElementById(`input${i}`);
+        if (!inputField.disabled) {
+            checkAnswer(i);
+        }
+    });
+
+    finishGame();
+}
+
+function finishGame() {
+    isQuizActive = false;
+    clearInterval(timerInterval);
+    
+    // Disable all inputs
+    questions.forEach((q, i) => {
+        const inputField = document.getElementById(`input${i}`);
+        inputField.disabled = true;
+        document.getElementById(`btnCheck${i}`).disabled = true;
+        document.getElementById(`hintBtn${i}`).disabled = true;
+        
+        // Reveal answers for wrong questions
+        if(inputField.value.trim().toLowerCase() !== q.answer) {
+             const result = document.getElementById(`result${i}`);
+             result.innerHTML = `<span class="incorrect">Missed. Answer: ${q.answer}</span>`;
+        }
+    });
+
+    const submitBtn = document.getElementById("submit-all-btn");
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Quiz Completed";
+
+    // Final Score Alert
+    const score = correctAnswersCount;
+    const total = questions.length;
+    let msg = "";
+    if(score === total) msg = "Perfect Score! Amazing job!";
+    else if (score > 7) msg = "Great job! You passed.";
+    else msg = "Good effort, keep practicing.";
+
+    alert(`Quiz Submitted!\n\nYour Score: ${score} / ${total}\n${msg}`);
+}
+
+/* ---------- TIMER (10 MIN COUNTDOWN) ---------- */
+let timeLeft = 600; 
+const timerDisplay = document.getElementById("timer");
+
+const timerInterval = setInterval(() => {
+    if(timeLeft <= 0) {
+        timerDisplay.textContent = "00:00";
+        alert("Time's up!");
+        finishGame();
+    } else {
+        timeLeft--;
+        let min = String(Math.floor(timeLeft / 60)).padStart(2, "0");
+        let sec = String(timeLeft % 60).padStart(2, "0");
+        timerDisplay.textContent = `${min}:${sec}`;
+        
+        if(timeLeft < 60) {
+            timerDisplay.style.backgroundColor = "#d9534f"; 
+            timerDisplay.style.color = "white";
+        }
+    }
+}, 1000);
+
+/* ---------- DISABLE CLIPBOARD ---------- */
+document.addEventListener("copy", e => e.preventDefault());
+document.addEventListener("paste", e => e.preventDefault());
+document.addEventListener("cut", e => e.preventDefault());
+
+</script>
+
+</body>
+</html>

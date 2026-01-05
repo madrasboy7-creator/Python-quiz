@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Result</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --card-bg: #141414;
+            --accent-yellow: #FFD700;
+            --text-white: #FFFFFF;
+            --text-gray: #B0B0B0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-white);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            text-transform: uppercase;
+            font-weight: 900;
+            font-size: 1.6rem;
+            letter-spacing: 1px;
+            text-align: center;
+            margin-bottom: 25px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            max-width: 900px;
+        }
+
+        .logo-wrapper {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            animation: fadeIn 1s ease-in;
+        }
+
+        .logo-img {
+            width: 120px;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(0, 191, 255, 0.3);
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .result-card {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 800px;
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid #333;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 40px;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .card-left {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-right: 1px solid #333;
+            padding-right: 20px;
+        }
+
+        .card-right { flex: 1.5; text-align: left; }
+
+        h1 {
+            color: var(--accent-yellow);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            line-height: 1.1;
+        }
+
+        /* Changed Label Style */
+        .sub-text { color: var(--text-gray); font-size: 1.1rem; margin-bottom: 20px; }
+        .highlight-name { color: var(--text-white); font-weight: 700; text-transform: capitalize; }
+
+        .feedback-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid var(--accent-yellow);
+            padding: 12px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+        }
+        
+        .feedback-box strong { display: block; color: #fff; margin-bottom: 4px; }
+
+        .btn-primary {
+            background-color: var(--accent-yellow);
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #ffcc00;
+            transform: translateY(-2px);
+        }
+        
+        .btn-disabled {
+            background-color: #333 !important;
+            color: #777 !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Score Circle */
+        .score-wrapper { position: relative; width: 200px; height: 200px; }
+        .progress-ring__circle {
+            transition: stroke-dashoffset 1.5s ease-in-out;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        .score-content {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .score-number { font-size: 3rem; font-weight: 800; color: var(--accent-yellow); }
+        .score-label { font-size: 0.8rem; color: var(--text-gray); letter-spacing: 1px; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @media (max-width: 768px) {
+            .result-card { flex-direction: column; padding: 30px 20px; text-align: center; }
+            .card-left { border-right: none; border-bottom: 1px solid #333; padding-right: 0; padding-bottom: 30px; margin-bottom: 20px; width: 100%; }
+            .card-right { text-align: center; }
+            .feedback-box { text-align: left; }
+            .btn-primary { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>Prince Shri Venkateshwara Arts And Science College</header>
+
+    <div class="logo-wrapper">
+        <img src="coding.jpg" alt="Logo" class="logo-img">
+    </div>
+
+    <div class="result-card">
+        <div class="card-left">
+            <div class="score-wrapper">
+                <svg class="progress-ring" width="200" height="200">
+                    <circle stroke="#2a2a2a" stroke-width="12" fill="transparent" r="85" cx="100" cy="100" />
+                    <circle class="progress-ring__circle" stroke="#FFD700" stroke-width="12" stroke-linecap="round" fill="transparent" r="85" cx="100" cy="100" />
+                </svg>
+                <div class="score-content">
+                    <div class="score-number" id="scoreDisplay">0</div>
+                    <div class="score-label">OUT OF <span id="totalDisplay">10</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-right">
+            <h1>Quiz Result</h1>
+            <p class="sub-text">Name: <span class="highlight-name">...</span></p>
+
+            <div class="feedback-box">
+                </div>
+
+            <button class="btn-primary" id="actionBtn">Checking Result...</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Retrieve Data from LocalStorage
+            const savedName = localStorage.getItem("userName") || "Student"; 
+            const savedScore = parseFloat(localStorage.getItem("currentScore")) || 0;
+            const totalScore = parseFloat(localStorage.getItem("currentTotal")) || 10; 
+            
+            // --- PASSING REQUIREMENT (Score must be 7 or more) ---
+            const passingScore = 7; 
+            // -----------------------------------------------------
+
+            // 2. Update Name and Total
+            document.querySelector('.highlight-name').textContent = savedName;
+            document.getElementById('totalDisplay').textContent = totalScore;
+
+            // 3. Logic for Pass/Fail
+            const feedbackBox = document.querySelector('.feedback-box');
+            const actionBtn = document.getElementById('actionBtn');
+
+            if (savedScore >= passingScore) {
+                // --- PASSED (Score >= 7) ---
+                feedbackBox.innerHTML = `
+                    <strong>Result: PASSED ✅</strong>
+                    <span>Excellent work, ${savedName}! You scored ${savedScore}. You qualify for Round 3.</span>
+                `;
+                actionBtn.textContent = "Start Round 3 🚀";
+                actionBtn.onclick = () => window.location.href = "round3.html";
+            } else {
+                // --- FAILED (Score < 7) ---
+                feedbackBox.innerHTML = `
+                    <strong>Result: DID NOT QUALIFY ❌</strong>
+                    <span>You scored ${savedScore}. You needed ${passingScore} to continue.</span>
+                `;
+                
+                // Disable button
+                actionBtn.textContent = "Better Luck Next Time";
+                actionBtn.className = "btn-primary btn-disabled";
+                actionBtn.disabled = true;
+                actionBtn.onclick = null;
+            }
+
+            // 4. Circular Animation
+            const circle = document.querySelector('.progress-ring__circle');
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const radius = circle.r.baseVal.value;
+            const circumference = radius * 2 * Math.PI;
+
+            circle.style.strokeDasharray = `${circumference} ${circumference}`;
+            circle.style.strokeDashoffset = circumference;
+
+            const percent = (savedScore / totalScore) * 100;
+            const offset = circumference - (percent / 100) * circumference;
+            setTimeout(() => { circle.style.strokeDashoffset = offset; }, 300);
+
+            // 5. Number Animation
+            let currentScore = 0;
+            const duration = 1000;
+            const steps = 50;
+            const increment = savedScore / steps;
+
+            if (savedScore > 0) {
+                const counter = setInterval(() => {
+                    currentScore += increment;
+                    if (currentScore >= savedScore) {
+                        currentScore = savedScore;
+                        clearInterval(counter);
+                    }
+                    scoreDisplay.textContent = Math.round(currentScore);
+                }, duration / steps);
+            } else {
+                scoreDisplay.textContent = "0";
+            }
+        });
+    </script>
+</body>
+</html>
